@@ -22,6 +22,11 @@ app.add_middleware(
 # Routes
 app.include_router(router, prefix="/api/v1")
 
+# Health check endpoint (requerido por Railway)
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 # Startup
 @app.on_event("startup")
 async def startup():
@@ -33,4 +38,7 @@ async def startup():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host=settings.host, port=settings.port)
+    # Railway asigna dinámicamente el puerto en la variable PORT
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+    uvicorn.run(app, host=host, port=port)
